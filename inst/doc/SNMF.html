@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="By 21030" />
+
+
+<title>Introduction Non-negative matrix factorization</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction Non-negative matrix factorization</h1>
+<h4 class="author">By 21030</h4>
+<h4 class="date">2021/12/15</h4>
+
+
+
+<div id="background" class="section level1">
+<h1>Background</h1>
+<pre><code>Non-negative matrix factorization is the form of decomposing a matrix into two non-negative matrix products: V = W * H. Our SNMF algorithm combines BeSS and NMF to further control the number of non-zero elements in H, thereby further achieving sparsity.</code></pre>
+</div>
+<div id="nmf" class="section level1">
+<h1>NMF</h1>
+<pre><code>The elements of a matrix in image and text clustering cannot be negative, so non-negative matrix factorization is significant.  The operation is performed by standard non-negative matrix factorization.</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  cbNMF<span class="ot">&lt;-</span><span class="cf">function</span>(V,r,maxiter){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  V<span class="ot">&lt;-</span><span class="fu">as.matrix</span>(V)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  h<span class="ot">&lt;-</span><span class="fu">nrow</span>(V)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  u<span class="ot">&lt;-</span><span class="fu">ncol</span>(V)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  W<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">runif</span>(h<span class="sc">*</span>r),<span class="at">nrow =</span> h,<span class="at">ncol =</span> r)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  H<span class="ot">=</span><span class="fu">matrix</span>(<span class="fu">runif</span>(r<span class="sc">*</span>u),<span class="at">nrow =</span> r,<span class="at">ncol =</span> u)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>maxiter) {</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    W<span class="ot">=</span>W<span class="sc">*</span>(V<span class="sc">%*%</span><span class="fu">t</span>(H))<span class="sc">/</span>(W<span class="sc">%*%</span>H<span class="sc">%*%</span><span class="fu">t</span>(H))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    W<span class="ot">=</span>W<span class="sc">/</span>(<span class="fu">matrix</span>(<span class="fu">rep</span>(<span class="dv">1</span>,h),h,<span class="dv">1</span>)<span class="sc">%*%</span><span class="fu">colSums</span>(W))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    H<span class="ot">=</span>H<span class="sc">*</span>((<span class="fu">t</span>(W)<span class="sc">%*%</span>V)<span class="sc">/</span>(<span class="fu">t</span>(W)<span class="sc">%*%</span>W<span class="sc">%*%</span>H))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  MV<span class="ot">=</span>W<span class="sc">%*%</span>H</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">W=</span>W,<span class="at">H=</span>H,<span class="at">MV=</span>MV)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<pre><code>Example 1,when r=5,maxiter=1000</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(StatComp21030)</span></code></pre></div>
+<pre><code>## 
+## 载入程辑包：&#39;StatComp21030&#39;</code></pre>
+<pre><code>## The following objects are masked _by_ &#39;.GlobalEnv&#39;:
+## 
+##     C_Gibbs, cbNMF</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;~/StatComp21030/data/v.rda&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cbNMF</span>(v,<span class="at">r=</span><span class="dv">5</span>,<span class="at">maxiter=</span><span class="dv">1000</span>)</span></code></pre></div>
+<pre><code>## $W
+##              [,1]         [,2]        [,3]       [,4]         [,5]
+##  [1,] 0.095385829 0.2551672206 0.064129494 0.15306204 2.011396e-01
+##  [2,] 0.092371605 0.2516449891 0.036860882 0.20077374 1.776383e-01
+##  [3,] 0.151664110 0.2254047787 0.095485069 0.01614822 1.824183e-01
+##  [4,] 0.265744294 0.0704144636 0.009750196 0.08294372 1.808344e-01
+##  [5,] 0.176025306 0.0006173088 0.043864958 0.20578518 8.636315e-02
+##  [6,] 0.030696865 0.0271857942 0.222163005 0.04108906 8.913827e-02
+##  [7,] 0.009824248 0.0355938252 0.212151300 0.04954455 6.639610e-02
+##  [8,] 0.031254639 0.0369682178 0.173664703 0.10274958 9.366152e-03
+##  [9,] 0.081427184 0.0414137916 0.092820648 0.07724153 6.244649e-11
+## [10,] 0.065605921 0.0555896103 0.049109745 0.07066238 6.705736e-03
+## 
+## $H
+##              V1       V2       V3        V4        V5       V6           V7
+## [1,] 259.977047 214.6484 158.2974  25.30644  54.49507 101.4558 208.36425811
+## [2,] 140.096594 123.6062  86.8279 118.69366 138.30179 106.6080 215.03672096
+## [3,] 440.573425 369.9098 318.5703 254.31818 221.51388  73.7022   0.02277407
+## [4,] 269.693308 191.1019 174.3729 210.76702  46.77470 113.4666 124.10011461
+## [5,]   3.186038  91.3421 172.4251 238.64128 358.08708 391.1294 213.72775083
+##             V8        V9         V10
+## [1,] 201.75124  59.44582   0.1439699
+## [2,] 298.80673 409.28364 389.1165936
+## [3,]  42.44459  31.57114   8.6468913
+## [4,]  39.59798  62.37837  85.8555576
+## [5,] 128.19559  98.68956  67.5132623
+## 
+## $MV
+##              V1        V2        V3        V4        V5        V6        V7
+##  [1,] 130.72058 123.35975 119.05610 129.27054 133.87863 137.64583 136.73091
+##  [2,] 130.22233 119.16160 113.85357 126.28897 121.00306 131.17640 136.24297
+##  [3,] 118.01207 115.48519 108.26747 101.81184 126.66707 119.63607 121.06571
+##  [4,] 106.19343 101.72045  96.93021  78.19880  95.01413 115.32764 119.45619
+##  [5,] 120.94880 101.30046  92.66655  79.66604  59.94565  78.28644  80.80729
+##  [6,] 121.03368 108.12392 100.52874  90.43599  88.48605  61.91333  36.39761
+##  [7,] 114.58225 100.51805  92.31837  84.71452  78.54554  52.01845  30.04501
+##  [8,] 117.55738  96.00970  83.01352  73.23630  53.44512  35.23356  29.21887
+##  [9,]  88.69696  71.69349  59.52431  46.86213  34.33899  28.28172  35.45980
+## [10,]  65.55893  53.23584  44.33472  37.24145  27.84828  26.84252  35.82727
+##              V8        V9       V10
+##  [1,] 130.05800 141.52884 126.57887
+##  [2,] 126.11653 139.70401 127.48175
+##  [3,] 126.02837 123.29494 102.25829
+##  [4,] 101.53498  67.94506  46.85190
+##  [5,]  56.77966  33.46118  24.14330
+##  [6,]  36.80022  31.32553  22.04962
+##  [7,]  32.09596  31.49295  24.42230
+##  [8,]  29.99252  29.80493  25.34507
+##  [9,]  35.80110  29.53915  23.56074
+## [10,]  35.58880  33.27196  28.58442</code></pre>
+<pre><code>Example 2,when r=10,maxiter=1000</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cbNMF</span>(v,<span class="at">r=</span><span class="dv">10</span>,<span class="at">maxiter=</span><span class="dv">1000</span>)</span></code></pre></div>
+<pre><code>## $W
+##              [,1]         [,2]        [,3]        [,4]         [,5]
+##  [1,] 0.091565358 0.0612381185 0.177375974 0.235147688 0.3928582552
+##  [2,] 0.007269016 0.2056712399 0.090790081 0.297629286 0.2385125097
+##  [3,] 0.080758031 0.0562620701 0.196039346 0.029151065 0.2226341949
+##  [4,] 0.024564355 0.2886432327 0.206359525 0.018669758 0.0828432955
+##  [5,] 0.126986034 0.2292500501 0.137665210 0.198608886 0.0005401203
+##  [6,] 0.240817419 0.0868686512 0.003658588 0.070763066 0.0170155303
+##  [7,] 0.260191186 0.0158129732 0.020612355 0.049117964 0.0079029587
+##  [8,] 0.037319201 0.0320037591 0.005132489 0.083974333 0.0002989928
+##  [9,] 0.025762160 0.0236775276 0.071530901 0.009313040 0.0123265626
+## [10,] 0.104767240 0.0005723777 0.090835531 0.007624914 0.0250675801
+##               [,6]        [,7]       [,8]        [,9]       [,10]
+##  [1,] 2.187287e-01 0.026386490 0.24043544 0.062207611 0.086816814
+##  [2,] 8.008247e-03 0.118071820 0.02298600 0.318675541 0.250711605
+##  [3,] 1.584136e-01 0.000223558 0.20974306 0.202375642 0.275711455
+##  [4,] 1.036274e-01 0.077652186 0.04685523 0.083479341 0.244582190
+##  [5,] 2.811518e-02 0.062993472 0.13201174 0.007731963 0.009882619
+##  [6,] 1.808326e-01 0.131702783 0.04543528 0.039644857 0.036272576
+##  [7,] 1.813158e-01 0.110585590 0.04589999 0.079712073 0.002932181
+##  [8,] 9.194438e-02 0.223986625 0.14056407 0.029038215 0.048465555
+##  [9,] 2.896244e-02 0.176362748 0.08716381 0.057410564 0.041982135
+## [10,] 5.169301e-05 0.072034728 0.02890539 0.119724193 0.002642868
+## 
+## $H
+##               V1         V2        V3        V4         V5        V6         V7
+##  [1,] 196.912722 193.803154 121.68821  60.38074 185.854008  39.62763  31.099570
+##  [2,]  92.858508 119.202418 102.07751  49.36997  44.201141 176.75435  98.379956
+##  [3,] 134.304038   4.273639  18.09890  38.30238   3.075262 104.10164 225.236209
+##  [4,]  68.765215  54.849502  78.02205 156.77379  68.769782  43.63985  98.688920
+##  [5,]  14.592287   2.026273  24.05043  14.49238 114.907637 134.21440  94.576443
+##  [6,]  57.699375  44.899464 115.47389 191.46719  94.047223 138.21789  15.089028
+##  [7,] 296.243960 175.500657 177.31457 118.78653  47.612972  13.53070   1.074873
+##  [8,] 146.898033 209.568256 148.47245  64.16052  48.411366  12.02233  45.495538
+##  [9,] 106.383063  98.042023  25.07318 108.40711  21.585999  93.65194  61.512531
+## [10,]   2.340814  86.816483  96.73998  44.86668 191.553427  32.23110  88.851836
+##                V8         V9         V10
+##  [1,]   0.4731248  28.478382   2.6053987
+##  [2,]  41.2113266   5.929144   0.1473632
+##  [3,] 184.6309124  68.095526   2.1048373
+##  [4,]  49.4649249  39.636566  66.3864564
+##  [5,] 142.7255727 238.189793 193.0819680
+##  [6,]  59.8632208  11.079389   7.3898015
+##  [7,]  65.0104211  51.626839   7.1753402
+##  [8,]   6.5767986  27.596896  81.3102495
+##  [9,]  52.0325720 129.544189 154.7209640
+## [10,] 108.0205125  62.813573  35.1006985
+## 
+## $MV
+##              V1        V2        V3        V4        V5        V6        V7
+##  [1,] 132.01975 117.97257 123.99148 128.98359 133.02337 138.01070 134.99323
+##  [2,] 129.97543 122.02926 109.99757 127.01620 120.98718 131.99917 136.01182
+##  [3,] 114.90106 120.13060 107.96722 101.08328 127.93091 116.96527 125.01362
+##  [4,] 107.16711  98.75986  98.08293  79.85999  93.12558 117.04656 115.96322
+##  [5,] 118.96885 105.01973  92.02067  78.02043  61.97197  75.99212  85.01318
+##  [6,] 121.51909 108.74848  99.65169  89.41835  88.71046  62.85461  36.05109
+##  [7,] 117.41620 100.34672  87.31462  84.66566  80.22783  53.12466  29.99181
+##  [8,] 112.29966  95.62639  91.07990  75.75131  50.20281  33.08528  27.89639
+##  [9,]  90.62622  68.44903  60.92794  47.29765  32.73322  28.88040  33.18064
+## [10,]  72.10465  51.89923  35.97715  34.91084  31.10549  30.03308  35.88991
+##              V8        V9       V10
+##  [1,] 132.02391 141.87732 126.11311
+##  [2,] 125.97610 140.06651 126.93269
+##  [3,] 122.95905 121.25742 104.76914
+##  [4,] 105.07806  69.56302  44.40964
+##  [5,]  52.94265  31.17998  26.88048
+##  [6,]  35.96534  31.95097  22.01380
+##  [7,]  30.94763  32.23163  23.81187
+##  [8,]  34.21687  28.26928  25.65516
+##  [9,]  37.70938  30.95583  22.14249
+## [10,]  32.19040  35.63833  27.29470</code></pre>
+</div>
+<div id="snmf" class="section level1">
+<h1>SNMF</h1>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>SNMF<span class="ot">&lt;-</span><span class="cf">function</span>(V,r,maxiter,kong){</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  V<span class="ot">&lt;-</span><span class="fu">as.matrix</span>(V)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  h<span class="ot">&lt;-</span><span class="fu">nrow</span>(V)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  u<span class="ot">&lt;-</span><span class="fu">ncol</span>(V)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  W<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="fu">runif</span>(h<span class="sc">*</span>r),<span class="at">nrow =</span> h,<span class="at">ncol =</span> r)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  H<span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="fu">runif</span>(r<span class="sc">*</span>u),<span class="at">nrow =</span> r,<span class="at">ncol =</span> u)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>maxiter) {</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    W<span class="ot">&lt;-</span>W<span class="sc">*</span>(V<span class="sc">%*%</span><span class="fu">t</span>(H))<span class="sc">/</span>(W<span class="sc">%*%</span>H<span class="sc">%*%</span><span class="fu">t</span>(H))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    W<span class="ot">&lt;-</span>W<span class="sc">/</span>(<span class="fu">matrix</span>(<span class="fu">rep</span>(<span class="dv">1</span>,h),h,<span class="dv">1</span>)<span class="sc">%*%</span><span class="fu">colSums</span>(W))</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    H<span class="ot">&lt;-</span>H<span class="sc">*</span>((<span class="fu">t</span>(W)<span class="sc">%*%</span>V)<span class="sc">/</span>(<span class="fu">t</span>(W)<span class="sc">%*%</span>W<span class="sc">%*%</span>H))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    y<span class="ot">&lt;-</span><span class="fu">t</span>(W)<span class="sc">%*%</span>W<span class="sc">%*%</span>H<span class="sc">-</span><span class="fu">t</span>(W)<span class="sc">%*%</span>V</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>r) {</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>      y[k,]<span class="ot">&lt;-</span>y[k,]<span class="sc">/</span><span class="fu">c</span>(<span class="fu">t</span>(W[,k])<span class="sc">%*%</span>W[,k])</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    deta0<span class="ot">&lt;-</span><span class="fl">0.5</span><span class="sc">*</span><span class="fu">sqrt</span>((H<span class="sc">-</span>y)<span class="sc">*</span>(H<span class="sc">-</span>y))</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>r) {</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>      deta0[k,]<span class="ot">&lt;-</span>deta0[k,]<span class="sc">%*%</span>(<span class="fu">t</span>(W[,k])<span class="sc">%*%</span>W[,k])</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    As<span class="ot">&lt;-</span><span class="fu">order</span>(deta0,<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    deta0[As]</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    H[deta0<span class="sc">&lt;</span>deta0[As[kong]]]<span class="ot">=</span><span class="fl">0.00001</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  MV<span class="ot">&lt;-</span>W<span class="sc">%*%</span>H</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">W=</span>W,<span class="at">H=</span>H,<span class="at">MV=</span>MV)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>Example 3,when r=5,maxiter=1000,kong=50</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SNMF</span>(v,<span class="at">r=</span><span class="dv">5</span>,<span class="at">maxiter=</span><span class="dv">1000</span>,<span class="at">kong=</span><span class="dv">50</span>)</span></code></pre></div>
+<pre><code>## $W
+##             [,1]         [,2]         [,3]         [,4]       [,5]
+##  [1,] 0.10465992 2.478581e-01 0.2551232841 0.1659193187 0.02934222
+##  [2,] 0.06624769 2.498352e-01 0.2524930134 0.1674008414 0.04110927
+##  [3,] 0.16159846 2.069799e-01 0.1193353287 0.1972457498 0.02697407
+##  [4,] 0.23480588 1.527891e-01 0.0007265972 0.0199454182 0.12717680
+##  [5,] 0.12693887 6.852673e-02 0.0309261939 0.0001688185 0.19724047
+##  [6,] 0.14450393 7.302734e-06 0.1166827018 0.0596976902 0.12575362
+##  [7,] 0.10396293 4.384773e-11 0.1201985752 0.0764186999 0.11475575
+##  [8,] 0.02875762 2.747190e-03 0.0904203882 0.1005042112 0.14501603
+##  [9,] 0.01805040 2.686931e-02 0.0092541214 0.1086411823 0.11794574
+## [10,] 0.01047430 4.438723e-02 0.0048397961 0.1040580698 0.07468604
+## 
+## $H
+##             V1        V2        V3        V4        V5         V6         V7
+## [1,] 156.63502 213.15480 211.88334 151.69814 334.19178 219.690338  98.469348
+## [2,]  24.25449  24.71762  42.35023  73.43385  51.17636 318.555697 486.949812
+## [3,] 195.57045 184.28525 203.24640 273.74843 211.09653 123.876936   1.104938
+## [4,] 266.16723 228.09141 160.36740 114.37398 185.51975   2.807585   1.876400
+## [5,] 471.73471 340.20685 291.79769 233.85007  37.50635 121.328896 172.941611
+##              V8         V9          V10
+## [1,] 132.072184  58.345690 5.125502e-04
+## [2,] 372.622710 327.242373 2.935303e+02
+## [3,]   9.395257  98.955982 1.221083e+02
+## [4,] 117.547911 172.917656 1.366500e+02
+## [5,]  79.049439   4.884698 5.891383e-09
+## 
+## $MV
+##              V1        V2        V3        V4        V5        V6        V7
+##  [1,] 130.30368 123.27788 119.69547 129.75602 133.39843 137.57917 136.66797
+##  [2,] 129.76579 118.99543 114.77688 126.27528 120.82351 130.87620 135.88317
+##  [3,] 118.89559 115.72010 106.76290 101.24904 127.39331 120.04564 121.86820
+##  [4,] 105.92927 101.77628  96.67828  79.05995  94.91297 115.83264 119.55419
+##  [5,] 120.68351 101.59175  93.66538  78.89857  59.88638  77.47931  80.01424
+##  [6,] 120.66615 108.70356 100.60180  90.09858  88.71537  61.62789  36.22174
+##  [7,] 114.26595 100.78216  92.19847  84.25111  78.59831  51.86722  30.35941
+##  [8,] 117.41466  95.12047  83.02017  74.72373  52.92312  36.27071  29.53729
+##  [9,]  89.84468  71.12314  58.68216  47.25197  33.93968  28.28649  35.47322
+## [10,]  66.59260  53.36515  43.56355  35.54022  28.89969  26.39418  35.76268
+##              V8        V9       V10
+##  [1,] 130.40013 141.29581 126.57948
+##  [2,] 127.14327 139.75499 127.04107
+##  [3,] 124.90735 123.20913 102.28042
+##  [4,] 100.34863  67.84101  47.66261
+##  [5,]  58.20186  33.88417  23.91415
+##  [6,]  37.14203  30.91708  22.40784
+##  [7,]  32.91414  31.73485  25.11992
+##  [8,]  28.94877  29.61183  25.58139
+##  [9,]  34.57710  30.12380  23.86279
+## [10,]  36.10422  33.97374  27.83952</code></pre>
+<pre><code>Example 4,when r=10,maxiter=1000,kong=100</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">SNMF</span>(v,<span class="at">r=</span><span class="dv">10</span>,<span class="at">maxiter=</span><span class="dv">1000</span>,<span class="at">kong=</span><span class="dv">100</span>)</span></code></pre></div>
+<pre><code>## $W
+##             [,1]        [,2]       [,3]        [,4]         [,5]         [,6]
+##  [1,] 0.06086350 0.413758409 0.12650841 0.149808203 2.556571e-01 0.1929105298
+##  [2,] 0.03335666 0.142233167 0.10540725 0.056124269 2.217126e-01 0.2778713618
+##  [3,] 0.20081177 0.241452597 0.09927734 0.050928484 8.640560e-02 0.2818897171
+##  [4,] 0.15430415 0.091717733 0.33070690 0.280985433 4.562437e-03 0.1355791010
+##  [5,] 0.08166192 0.003545711 0.14642427 0.172674808 6.390894e-02 0.0025181992
+##  [6,] 0.06901147 0.023708552 0.00172296 0.158904675 1.867976e-01 0.0566828855
+##  [7,] 0.25928978 0.018838412 0.03483688 0.062171730 1.076472e-01 0.0027386259
+##  [8,] 0.07569664 0.033902571 0.06088844 0.028103130 3.604554e-02 0.0007743273
+##  [9,] 0.01736895 0.009048031 0.07711983 0.033520290 1.773646e-05 0.0236834345
+## [10,] 0.04763515 0.021794818 0.01710771 0.006778979 3.724516e-02 0.0253518178
+##              [,7]       [,8]       [,9]       [,10]
+##  [1,] 0.145626445 0.10570202 0.10448420 0.046333446
+##  [2,] 0.374136149 0.07129701 0.18695188 0.064469322
+##  [3,] 0.172373477 0.13282317 0.07654956 0.026154326
+##  [4,] 0.076955314 0.13082063 0.02594872 0.009059995
+##  [5,] 0.153447586 0.20675783 0.01326456 0.120419084
+##  [6,] 0.013474585 0.09419862 0.01349679 0.250963358
+##  [7,] 0.008574870 0.02477630 0.14270216 0.128119808
+##  [8,] 0.003685780 0.04152814 0.13113717 0.225545121
+##  [9,] 0.005526844 0.08455350 0.15207092 0.118472297
+## [10,] 0.046198950 0.10754277 0.15339405 0.010463244
+## 
+## $H
+##              V1        V2        V3         V4         V5        V6        V7
+##  [1,] 123.27307 153.57929 113.50154 109.802475 152.739764  76.52549  36.90946
+##  [2,]  35.53785  58.66464 110.11454  97.497157  55.693046  96.62058 116.20362
+##  [3,]  94.74422  52.86839  93.30170  74.259853  33.110469  33.91026 142.34544
+##  [4,]  44.89899  49.45973  55.74612  46.927822  67.310560 196.36714  34.39005
+##  [5,] 109.80410  37.13980  28.12566 107.973190 144.354041  38.22433  16.66434
+##  [6,]  18.90197  57.28090  37.44994  15.034983 184.997301 111.87592  88.40133
+##  [7,]  22.73781  78.44645  69.32381 111.913642   4.380848 124.87798 154.96607
+##  [8,] 217.20573 148.11563  70.30220   9.370625  51.809060  24.19377 139.08314
+##  [9,] 210.11895 108.85559  71.66190  87.127796  31.687783  61.96029  25.75438
+## [10,] 239.81402 244.52968 257.49525 187.089644  93.940348  23.46521   5.26526
+##              V8          V9         V10
+##  [1,]  15.91666   9.8338864   0.4148790
+##  [2,] 114.89921 143.1150962 171.0353837
+##  [3,] 138.46711  52.2589099   0.3307318
+##  [4,]  22.83882   9.7045688   0.2381067
+##  [5,]  13.85580  58.4631486  12.0543307
+##  [6,] 185.51959 175.7978997 112.9810696
+##  [7,]  48.31363  72.2144262 132.5774922
+##  [8,]  66.61240  17.3956185   0.2082780
+##  [9,]  74.50650 123.9452059  91.2858378
+## [10,]  29.08788   0.1944939  28.9651321
+## 
+## $MV
+##              V1        V2        V3        V4        V5        V6        V7
+##  [1,] 131.97352 118.04687 123.98325 129.01249 132.98298 138.00086 135.00379
+##  [2,] 130.00649 121.99191 110.00019 126.99738 121.00791 131.99525 136.00133
+##  [3,] 114.96998 120.05242 107.97632 101.01893 127.97537 116.99907 125.00665
+##  [4,] 107.08303  98.84901  98.06258  79.95463  93.06812 116.99857 115.98875
+##  [5,] 118.94693 105.10051  91.96957  78.02259  61.94958  76.00136  85.00622
+##  [6,] 122.01760 107.97105  99.98477  89.01479  89.00802  63.00249  35.99443
+##  [7,] 116.88272 101.20377  86.90338  85.07113  79.91599  52.99187  30.01684
+##  [8,] 112.28664  95.47404  91.26466  75.78554  50.21519  32.99888  27.94826
+##  [9,]  90.57944  68.77170  60.65039  47.27264  32.70349  28.98930  33.07358
+## [10,]  72.29037  51.47884  36.22756  34.84706  31.19657  30.04332  35.94328
+##              V8        V9       V10
+##  [1,] 131.98827 142.05281 125.95589
+##  [2,] 126.00279 139.99070 127.00607
+##  [3,] 122.98192 121.07123 104.94094
+##  [4,] 105.04865  69.80505  44.16111
+##  [5,]  52.95578  31.16253  26.87033
+##  [6,]  36.02571  30.92273  23.08515
+##  [7,]  30.95851  33.20701  22.84265
+##  [8,]  34.09176  28.58078  25.37997
+##  [9,]  37.82989  30.72723  22.32805
+## [10,]  32.13433  35.40319  27.52107</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
