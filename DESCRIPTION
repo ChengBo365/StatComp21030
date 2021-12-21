@@ -1,0 +1,20 @@
+Package: StatComp21030
+Type: Package
+Title: A New Algorithm for Sparse Nonnegative Matrix Factorization
+Version: 1.0
+Date: 2021-12-15
+Author: ChengBo
+Maintainer: ChengBo <cb1997@mail.ustc.edu.cn>
+Description: Contains two algorithms, the non-negative matrix factorization algorithm 
+    and the sparse non-negative matrix algorithm using BeSS algorithm.
+License: GPL (>= 2)
+Imports: Rcpp ,microbenchmark
+LinkingTo: Rcpp
+RoxygenNote: 7.1.2
+Encoding: UTF-8
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
+URL: http://github.com/ChengBo365/StatComp21030
+BugReports: http://github.com/ChengBo365/StatComp21030/issues
