@@ -1,0 +1,91 @@
+---
+title: "Introduction Non-negative matrix factorization"
+author: 'By 21030'
+date: "2021/12/15"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to StatComp21030}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+# Background
+
+    Non-negative matrix factorization is the form of decomposing a matrix into two non-negative matrix products: V = W * H. Our SNMF algorithm combines BeSS and NMF to further control the number of non-zero elements in H, thereby further achieving sparsity.
+
+# NMF
+
+    The elements of a matrix in image and text clustering cannot be negative, so non-negative matrix factorization is significant.  The operation is performed by standard non-negative matrix factorization.
+    
+```{r}
+  cbNMF<-function(V,r,maxiter){
+  V<-as.matrix(V)
+  h<-nrow(V)
+  u<-ncol(V)
+  W=matrix(runif(h*r),nrow = h,ncol = r)
+  H=matrix(runif(r*u),nrow = r,ncol = u)
+  for (i in 1:maxiter) {
+    W=W*(V%*%t(H))/(W%*%H%*%t(H))
+    W=W/(matrix(rep(1,h),h,1)%*%colSums(W))
+    H=H*((t(W)%*%V)/(t(W)%*%W%*%H))
+  }
+  MV=W%*%H
+  list(W=W,H=H,MV=MV)
+    }
+```
+    
+    Example 1,when r=5,maxiter=1000
+
+```{r}
+library(StatComp21030)
+load("~/StatComp21030/data/v.rda")
+cbNMF(v,r=5,maxiter=1000)
+```
+
+    Example 2,when r=10,maxiter=1000
+
+```{r}
+cbNMF(v,r=10,maxiter=1000)
+```
+
+# SNMF
+```{r}
+SNMF<-function(V,r,maxiter,kong){
+  V<-as.matrix(V)
+  h<-nrow(V)
+  u<-ncol(V)
+  W<-matrix(runif(h*r),nrow = h,ncol = r)
+  H<-matrix(runif(r*u),nrow = r,ncol = u)
+  for (i in 1:maxiter) {
+    W<-W*(V%*%t(H))/(W%*%H%*%t(H))
+    W<-W/(matrix(rep(1,h),h,1)%*%colSums(W))
+    H<-H*((t(W)%*%V)/(t(W)%*%W%*%H))
+    y<-t(W)%*%W%*%H-t(W)%*%V
+    for (k in 1:r) {
+      y[k,]<-y[k,]/c(t(W[,k])%*%W[,k])
+    }
+    deta0<-0.5*sqrt((H-y)*(H-y))
+    for (k in 1:r) {
+      deta0[k,]<-deta0[k,]%*%(t(W[,k])%*%W[,k])
+    }
+    As<-order(deta0,decreasing = TRUE)
+    deta0[As]
+    H[deta0<deta0[As[kong]]]=0.00001
+  }
+  MV<-W%*%H
+  list(W=W,H=H,MV=MV)
+}
+```
+
+    Example 3,when r=5,maxiter=1000,kong=50
+
+```{r}
+SNMF(v,r=5,maxiter=1000,kong=50)
+```
+
+    Example 4,when r=10,maxiter=1000,kong=100
+    
+```{r}
+SNMF(v,r=10,maxiter=1000,kong=100)
+```
